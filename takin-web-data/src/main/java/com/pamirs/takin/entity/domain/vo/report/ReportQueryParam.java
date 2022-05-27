@@ -19,6 +19,12 @@ import io.shulie.takin.common.beans.page.PagingDevice;
 @EqualsAndHashCode(callSuper = true)
 public class ReportQueryParam extends PagingDevice implements Serializable {
 
+    @ApiModelProperty(name = "sceneId", value = "场景ID")
+    private Long sceneId;
+
+    @ApiModelProperty(name = "reportId", value = "报告ID")
+    private Long reportId;
+
     /**
      * 场景名称
      */
@@ -42,5 +48,15 @@ public class ReportQueryParam extends PagingDevice implements Serializable {
      */
     @ApiModelProperty(value = "负责人姓名")
     private String managerName;
+    /**
+     * 报告开始时间
+     */
+    @ApiModelProperty(value = "报告开始时间")
+    private String reportStartTime;
 
+    /**
+     * 报告结束时间
+     */
+    @ApiModelProperty(value = "报告结束时间")
+    private String reportEndTime;
 }

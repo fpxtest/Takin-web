@@ -28,7 +28,6 @@ import io.shulie.takin.web.data.param.report.ReportApplicationSummaryCreateParam
 import io.shulie.takin.web.data.param.report.ReportMachineUpdateParam;
 import io.shulie.takin.web.data.param.report.ReportSummaryCreateParam;
 import io.shulie.takin.web.data.result.baseserver.BaseServerResult;
-import io.shulie.takin.web.data.result.report.ReportSummaryResult;
 import io.shulie.takin.web.ext.util.WebPluginUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -114,9 +113,9 @@ public class SummaryService {
         Integer passBusinessCount = 0;
         Map<String, Object> cloudMap = reportService.queryReportCount(reportId);
         if (MapUtils.isNotEmpty(cloudMap)) {
-            warnCount = (Integer)cloudMap.get("warnCount");
-            businessCount = (Integer)cloudMap.get("count");
-            passBusinessCount = (Integer)cloudMap.get("passSum");
+            warnCount = convertLong((Long)cloudMap.get("warnCount"));
+            businessCount = convertLong((Long)cloudMap.get("count"));
+            passBusinessCount = convertBigDecimal((BigDecimal)cloudMap.get("passSum"));
         }
         warnCount = warnCount != null ? warnCount : 0;
         businessCount = businessCount != null ? businessCount : 0;
@@ -131,16 +130,9 @@ public class SummaryService {
         reportSummary.setApplicationCount(appCount);
         reportSummary.setMachineCount(totalCount);
         reportSummary.setWarnCount(warnCount);
-
-        ReportSummaryResult summary = reportSummaryDAO.selectOneByReportId(reportId);
-
-        if (summary == null) {
-            try {
-                reportSummaryDAO.insert(reportSummary);
-            }catch (Exception e){
-                log.error("Build ReportSummary error, reportId={},tenantId={},envCode={}", reportId,WebPluginUtils.traceTenantId(),WebPluginUtils.traceEnvCode());
-            }
-        }
+        reportSummary.setTenantId(WebPluginUtils.traceTenantId());
+        reportSummary.setEnvCode(WebPluginUtils.traceEnvCode());
+        reportSummaryDAO.insertOrUpdate(reportSummary);
         log.debug("Build ReportSummary Success, reportId={}", reportId);
     }
 
@@ -179,7 +171,7 @@ public class SummaryService {
             //机器信息
             long startTime = System.currentTimeMillis();
             String searchAppIdSql = "select distinct(app_ip) as app_ip from app_base_data " +
-                "where time>=" + minTime + "ms and time <= " + maxTime + "ms and app_name = '" + applicationName + "'" +
+                "where time>=" + minTime + "ms and time <= " + maxTime + "ms and tag_app_name = '" + applicationName + "'" +
                 // 增加租户
                 " and tenant_app_key = '" + WebPluginUtils.traceTenantAppKey() + "'" +
                 " and env_code = '" + WebPluginUtils.traceEnvCode() + "'";
@@ -194,7 +186,7 @@ public class SummaryService {
                 long baseTime = System.currentTimeMillis();
                 String searchBaseSql = "select time, app_ip, cpu_rate, cpu_load, mem_rate, iowait, net_bandwidth_rate" +
                     " from app_base_data where time>=" + minTime + "ms and time <= " + maxTime
-                    + "ms and app_name = '" + applicationName + "'" + " and app_ip = '" + host + "'" +
+                    + "ms and tag_app_name = '" + applicationName + "'" + " and tag_app_ip = '" + host + "'" +
                     // 增加租户
                     " and tenant_app_key = '" + WebPluginUtils.traceTenantAppKey() + "'" +
                     " and env_code = '" + WebPluginUtils.traceEnvCode() + "'";
@@ -217,6 +209,16 @@ public class SummaryService {
     private TpsTargetArray calcTpsTarget(List<Metrices> metrics, Collection<BaseServerResult> vos) {
         if (CollectionUtils.isEmpty(vos)) {
             return null;
+        }
+        // metric数据为空兼容
+        if(CollectionUtils.isEmpty(metrics)) {
+            // 展示原数据
+            metrics = vos.stream().map(result -> {
+                Metrices metrices = new Metrices();
+                metrices.setTime(result.getTime().toEpochMilli());
+                metrices.setAvgTps(0D);
+                return metrices;
+            }).collect(Collectors.toList());
         }
         List<BaseServerResult> bases = Lists.newArrayList(vos);
         int currentIndex = 0;

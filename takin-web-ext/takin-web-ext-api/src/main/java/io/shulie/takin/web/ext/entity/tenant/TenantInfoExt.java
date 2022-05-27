@@ -40,9 +40,18 @@ public class TenantInfoExt {
      */
     private List<TenantEnv> envs;
 
+    /**
+     * 创建者
+     */
+    private Long createBy;
+
     @Data
     @NoArgsConstructor
     public static class TenantEnv {
+        /**
+         * 租户ID
+         */
+        private Long tenantId;
         /**
          * 环境代码
          */
@@ -61,5 +70,10 @@ public class TenantInfoExt {
          * 是否默认
          */
         private Boolean isDefault;
+
+        /**
+         * 安全中心地址
+         */
+        private String securityCenterDomain;
     }
 }
