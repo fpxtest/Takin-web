@@ -6,31 +6,32 @@ import java.util.Map;
 
 import javax.validation.Valid;
 
-import io.shulie.takin.cloud.sdk.model.request.engine.EnginePluginDetailsWrapperReq;
-import io.shulie.takin.cloud.sdk.model.request.engine.EnginePluginFetchWrapperReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.CloudUpdateSceneFileRequest;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.SceneIpNumReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.SceneManageDeleteReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.SceneManageIdReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.SceneManageQueryByIdsReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.SceneManageQueryReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.SceneManageWrapperReq;
-import io.shulie.takin.cloud.sdk.model.request.scenemanage.ScriptCheckAndUpdateReq;
-import io.shulie.takin.cloud.sdk.model.response.engine.EnginePluginDetailResp;
-import io.shulie.takin.cloud.sdk.model.response.engine.EnginePluginSimpleInfoResp;
-import io.shulie.takin.cloud.sdk.model.response.scenemanage.SceneManageListResp;
-import io.shulie.takin.cloud.sdk.model.response.scenemanage.SceneManageWrapperResp;
-import io.shulie.takin.cloud.sdk.model.response.scenemanage.ScriptCheckResp;
-import io.shulie.takin.cloud.sdk.model.response.strategy.StrategyResp;
-import io.shulie.takin.common.beans.response.ResponseResult;
+import io.shulie.takin.cloud.ext.content.script.ScriptNode;
 import io.shulie.takin.cloud.ext.content.trace.ContextExt;
+import io.shulie.takin.adapter.api.model.request.engine.EnginePluginDetailsWrapperReq;
+import io.shulie.takin.adapter.api.model.request.engine.EnginePluginFetchWrapperReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.CloudUpdateSceneFileRequest;
+import io.shulie.takin.adapter.api.model.request.scenemanage.SceneIpNumReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.SceneManageDeleteReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.SceneManageIdReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.SceneManageQueryByIdsReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.SceneManageQueryReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.SceneManageWrapperReq;
+import io.shulie.takin.adapter.api.model.request.scenemanage.ScriptAnalyzeRequest;
+import io.shulie.takin.adapter.api.model.request.scenemanage.ScriptCheckAndUpdateReq;
+import io.shulie.takin.adapter.api.model.response.engine.EnginePluginDetailResp;
+import io.shulie.takin.adapter.api.model.response.engine.EnginePluginSimpleInfoResp;
+import io.shulie.takin.adapter.api.model.response.scenemanage.SceneManageListResp;
+import io.shulie.takin.adapter.api.model.response.scenemanage.SceneManageWrapperResp;
+import io.shulie.takin.adapter.api.model.response.scenemanage.ScriptCheckResp;
+import io.shulie.takin.adapter.api.model.response.strategy.StrategyResp;
+import io.shulie.takin.common.beans.response.ResponseResult;
 import org.springframework.validation.annotation.Validated;
 
 /**
  * @author 无涯
  * @date 2020/10/27 4:22 下午
  */
-@Valid
 public interface SceneManageApi {
 
     /**
@@ -39,7 +40,7 @@ public interface SceneManageApi {
      * @param updateSceneFileRequest 请求入参
      * @return 响应参数
      */
-    ResponseResult<Object> updateSceneFileByScriptId(@Validated CloudUpdateSceneFileRequest updateSceneFileRequest);
+    ResponseResult<Object> updateSceneFileByScriptId(CloudUpdateSceneFileRequest updateSceneFileRequest);
 
     /**
      * 保存
@@ -120,4 +121,12 @@ public interface SceneManageApi {
      * @return -
      */
     ResponseResult<ScriptCheckResp> checkAndUpdateScript(ScriptCheckAndUpdateReq scriptCheckAndUpdateReq);
+
+    /**
+     * 解析脚本
+     *
+     * @param request 入参
+     * @return 脚本节点信息
+     */
+    List<ScriptNode> scriptAnalyze(ScriptAnalyzeRequest request);
 }
