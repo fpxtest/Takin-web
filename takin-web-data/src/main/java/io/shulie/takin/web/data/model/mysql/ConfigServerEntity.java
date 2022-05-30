@@ -49,4 +49,10 @@ public class ConfigServerEntity extends CommonWithTenantKeyEntity implements Ser
      */
     private Integer edition;
 
+    /**
+     * 用户Id
+     */
+    @TableField("`user_id`")
+    private Long userId;
+
 }

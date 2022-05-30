@@ -118,10 +118,11 @@ public class ConfigServerHelper {
             return tempFileDefault;
         }
         String redisKey = getRedisKey(configServerKeyEnum);
+        String redisFieldKey = getRedisFieldKey(configServerKeyEnum);
         String key = configServerKeyEnum.getNow();
 
         // redis 中获取值, 没有的话, 数据库查询
-        Object valueObject = RedisHelper.hashGet(redisKey, key);
+        Object valueObject = RedisHelper.hashGet(redisKey, redisFieldKey);
         if (valueObject != null && StrUtil.isNotBlank(valueObject.toString())) {
             return valueObject.toString();
         }
@@ -132,7 +133,7 @@ public class ConfigServerHelper {
         }
 
         // 放入redis，过期时间10分钟
-        RedisHelper.hashPut(redisKey, key, value);
+        RedisHelper.hashPut(redisKey, redisFieldKey, value);
         RedisHelper.expire(redisKey, 10L, TimeUnit.MINUTES);
         return value;
     }
@@ -153,6 +154,9 @@ public class ConfigServerHelper {
      * @return 配置值
      */
     private static String getValue(ConfigServerKeyEnum configServerKeyEnum, String key) {
+        if (configServerKeyEnum.getIsUser() == AppConstants.YES) {
+            return configServerDAO.getUserConfigValueByKey(configServerKeyEnum);
+        }
         return configServerKeyEnum.getIsTenant() == AppConstants.NO
             ? configServerDAO.getGlobalNotTenantValueByKey(key)
             : configServerDAO.getTenantEnvValueByKey(key);
@@ -164,9 +168,17 @@ public class ConfigServerHelper {
      * @param configServerKeyEnum 配置的枚举
      * @return redis key
      */
-    private static String getRedisKey(ConfigServerKeyEnum configServerKeyEnum) {
+    public static String getRedisKey(ConfigServerKeyEnum configServerKeyEnum) {
         return configServerKeyEnum.getIsTenant() == AppConstants.NO ? CONFIG_SERVER_GLOBAL_NOT_TENANT_KEY
             : getConfigServerRedisKey(WebPluginUtils.traceTenantAppKey(), WebPluginUtils.traceEnvCode());
+    }
+
+    public static String getRedisFieldKey(ConfigServerKeyEnum configServerKeyEnum) {
+        String configKey = configServerKeyEnum.getNow();
+        if (configServerKeyEnum.getIsUser() == AppConstants.YES) {
+            configKey = configKey + ":" + WebPluginUtils.traceUserId();
+        }
+        return configKey;
     }
 
 }

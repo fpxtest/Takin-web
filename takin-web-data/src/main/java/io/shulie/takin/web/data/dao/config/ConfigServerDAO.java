@@ -1,5 +1,6 @@
 package io.shulie.takin.web.data.dao.config;
 
+import io.shulie.takin.web.common.enums.config.ConfigServerKeyEnum;
 import io.shulie.takin.web.data.param.config.UpdateConfigServerParam;
 import io.shulie.takin.web.data.result.config.ConfigServerDetailResult;
 
@@ -55,5 +56,10 @@ public interface ConfigServerDAO {
      */
     boolean updateGlobalValueByKey(UpdateConfigServerParam updateConfigServerParam);
 
+    String getUserConfigValueByKey(ConfigServerKeyEnum key);
+
+    void deleteUserEnvConfig(Long envRef);
+
+    void saveOrUpdateEnvConfig(Long envRef);
 }
 

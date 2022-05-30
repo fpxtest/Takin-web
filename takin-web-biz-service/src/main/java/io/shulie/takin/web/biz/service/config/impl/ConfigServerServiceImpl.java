@@ -38,4 +38,13 @@ public class ConfigServerServiceImpl implements ConfigServerService {
         configServerDAO.updateGlobalValueByKey(updateConfigServerParam);
     }
 
+    @Override
+    public void deleteUserEnvConfig(Long envRef) {
+        configServerDAO.deleteUserEnvConfig(envRef);
+    }
+
+    @Override
+    public void updateUserEnvConfig(Long envRef) {
+        configServerDAO.saveOrUpdateEnvConfig(envRef);
+    }
 }

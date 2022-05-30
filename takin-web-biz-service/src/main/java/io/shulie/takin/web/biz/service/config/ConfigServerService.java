@@ -21,4 +21,8 @@ public interface ConfigServerService {
      */
     void update(UpdateConfigServerRequest updateRequest);
 
+    void deleteUserEnvConfig(Long envRef);
+
+    void updateUserEnvConfig(Long envRef);
+
 }
