@@ -1,8 +1,12 @@
 package io.shulie.takin.web.app.conf.mybatis;
 
+import com.alibaba.ttl.TransmittableThreadLocal;
 import com.baomidou.mybatisplus.autoconfigure.ConfigurationCustomizer;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.handler.TableNameHandler;
+import com.baomidou.mybatisplus.extension.plugins.inner.DynamicTableNameInnerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
+import io.shulie.takin.web.biz.constant.TakinWebContext;
 import io.shulie.takin.web.ext.util.WebPluginUtils;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -10,6 +14,9 @@ import net.sf.jsqlparser.expression.StringValue;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
 * @Package io.shulie.takin.web.app.conf.mybatis
@@ -21,6 +28,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MyBatisPlusConfig {
+
+//
+
 
     /**
      * 新多租户插件配置,一缓和二缓遵循mybatis的规则,需要设置 MybatisConfiguration#useDeprecatedExecutor = false 避免缓存万一出现问题
@@ -66,6 +76,12 @@ public class MyBatisPlusConfig {
         // 如果用了分页插件注意先 add TenantLineInnerInterceptor 再 add PaginationInnerInterceptor
         // 用了分页插件必须设置 MybatisConfiguration#useDeprecatedExecutor = false
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor());
+
+        //动态表名插件
+        DynamicTableNameInnerInterceptor dynamicTableNameInnerInterceptor = new DynamicTableNameInnerInterceptor();
+        dynamicTableNameInnerInterceptor.setTableNameHandler(((sql, tableName) -> TakinWebContext.getTable() ==null ?
+                tableName:TakinWebContext.getTable()));
+        interceptor.addInnerInterceptor(dynamicTableNameInnerInterceptor);
         return interceptor;
     }
 
@@ -78,5 +94,21 @@ public class MyBatisPlusConfig {
     public MySqlInjector sqlInjector() {
         return new MySqlInjector();
     }
+
+
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public MetaSelectSignInterceptor selectSignInterceptor() {
+//        return new MetaSelectSignInterceptor();
+//    }
+
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public MetaUpdateSignInterceptor updateSignInterceptor() {
+//        return new MetaUpdateSignInterceptor();
+//    }
+
+
+
 }
 

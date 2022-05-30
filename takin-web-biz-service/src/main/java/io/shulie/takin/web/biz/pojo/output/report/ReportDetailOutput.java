@@ -5,10 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import com.pamirs.takin.entity.domain.dto.report.LeakVerifyResult;
-import io.shulie.takin.cloud.common.bean.scenemanage.StopReasonBean;
 import io.shulie.takin.cloud.common.bean.scenemanage.WarnBean;
-import io.shulie.takin.cloud.common.bean.sla.SlaBean;
-import io.shulie.takin.cloud.sdk.model.common.BusinessActivitySummaryBean;
+import io.shulie.takin.adapter.api.model.ScriptNodeSummaryBean;
+import io.shulie.takin.adapter.api.model.common.SlaBean;
+import io.shulie.takin.adapter.api.model.common.StopReasonBean;
+import io.shulie.takin.adapter.api.model.response.scenemanage.BusinessActivitySummaryBean;
 import io.shulie.takin.web.ext.entity.UserCommonExt;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -100,11 +101,31 @@ public class ReportDetailOutput extends UserCommonExt {
     @ApiModelProperty(value = "业务活动链路概览")
     private List<BusinessActivitySummaryBean> businessActivity;
 
-
+    @ApiModelProperty(value = "节点链路详情")
+    private List<ScriptNodeSummaryBean> nodeDetail;
 
     @ApiModelProperty(name = "leakVerifyResult", value = "漏数验证结果")
     private LeakVerifyResult leakVerifyResult;
 
+    @ApiModelProperty("是否存在JTL文件")
+    private boolean hasJtl;
 
+    /**
+     * 资源Id
+     */
+    private String resourceId;
 
+    /**
+     * 压测引擎任务Id
+     */
+    private Long jobId;
+    /**
+     * 0-未校准
+     * 1-校准中
+     * 2-校准失败
+     * 3-校准成功
+     */
+    private Integer calibration;
+    private Integer calibrationStatus;
+    private String calibrationMessage;
 }
